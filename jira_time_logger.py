@@ -68,15 +68,17 @@ def arg(*args, **kw):
 def server_arg():
     """Return a decorator for --jira-server option."""
     default = os.getenv('JIRA_SERVER')
+    def_help = default or 'JIRA_SERVER environment variable'
     return arg('--jira-server', '-j', default=default, type=str,
-               help='Jira server (default: {})'.format(default))
+               help='Jira server (default: {})'.format(def_help))
 
 
 def user_arg():
     """Return a decorator for --jira-user option."""
     default = os.getenv('JIRA_USER')
+    def_help = default or 'JIRA_USER environment variable'
     return arg('--jira-user', '-u', default=default, type=str,
-               help='Jira user (default: {})'.format(default))
+               help='Jira user (default: {})'.format(def_help))
 
 
 @command(aliases=['l'])
