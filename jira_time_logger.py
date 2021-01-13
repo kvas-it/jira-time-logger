@@ -9,7 +9,9 @@ import keyring
 
 
 parser = argparse.ArgumentParser(description=__doc__)
-subparsers = parser.add_subparsers(help='sub-command help')
+subparsers = parser.add_subparsers(
+    help='Subcommands: use jtl <cmd> -h to get detailed help',
+)
 
 
 def command(*args, **kw):
