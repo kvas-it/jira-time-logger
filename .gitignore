@@ -1,3 +1,4 @@
+.python-version
 venv
 .eggs
 __pycache__

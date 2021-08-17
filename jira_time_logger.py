@@ -1,12 +1,22 @@
 """Log time in Jira."""
 
 import argparse
+import re
 import os
 import sys
 
 import jira
 import keyring
 
+
+WORKLOG_RX = re.compile(
+    r'\-\s+\[(?P<state>[\. x])\]\s*'
+    r'(?P<prefix>\W*)\s+'
+    r'(?P<comment>[\w\s]+)\s+'
+    r'(?P<time>\@\d+)?\s*'
+    r'\- (?P<issue>[A-Z]+\-\d+)\s+'
+    r'\[\d*(?P<tracking>[\.\;\,\s]*)\]'
+)
 
 parser = argparse.ArgumentParser(description=__doc__)
 subparsers = parser.add_subparsers(
@@ -96,6 +106,33 @@ def log(args):
         timeSpent=args.amount,
         comment=args.comment,
     )
+
+
+@command(aliases=['v'])
+def vimlog(args):
+    """Log time from vim worklog"""
+    line = input()
+    match = WORKLOG_RX.match(line)
+    if not match:
+        print(line + '?')
+        return
+    if match.group('state') == 'x':
+        print(line + '!')
+        return
+    minutes = 0
+    for c in match.group('tracking'):
+        if c == '.':
+            minutes += 30
+        if c == ';':
+            minutes += 15
+        if c == ',':
+            minutes += 5
+    args.jira.add_worklog(
+        issue=match.group('issue'),
+        timeSpent=f'{minutes}m',
+        comment=match.group('comment'),
+    )
+    print('- [x]' + line[5:])
 
 
 @command(aliases=['i'])
