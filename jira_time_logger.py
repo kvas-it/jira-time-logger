@@ -12,7 +12,7 @@ import keyring
 WORKLOG_RX = re.compile(
     r'\-\s+\[(?P<state>[\. x])\]\s*'
     r'(?P<prefix>\W*)\s+'
-    r'(?P<comment>[\w\s]+)\s+'
+    r'(?P<comment>[\w\s\.,;\-\/]+)\s+'
     r'(?P<time>\@\d+)?\s*'
     r'\- (?P<issue>[A-Z]+\-\d+)\s+'
     r'\[\d*(?P<tracking>[\.\;\,\s]*)\]'
@@ -127,12 +127,15 @@ def vimlog(args):
             minutes += 15
         if c == ',':
             minutes += 5
-    args.jira.add_worklog(
-        issue=match.group('issue'),
-        timeSpent=f'{minutes}m',
-        comment=match.group('comment'),
-    )
-    print('- [x]' + line[5:])
+    if minutes > 0:
+        args.jira.add_worklog(
+            issue=match.group('issue'),
+            timeSpent=f'{minutes}m',
+            comment=match.group('comment'),
+        )
+        print('- [x]' + line[5:])
+    else:
+        print(line)
 
 
 @command(aliases=['i'])
